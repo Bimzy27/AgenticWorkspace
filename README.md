@@ -34,12 +34,32 @@ bash bootstrap/linux.sh
 
 ### Windows 11
 
+Two scripts, run in order:
+
+**1. Workspace installer** — installs all development tools (run once on a fresh machine):
+
 ```powershell
-# Run from elevated PowerShell 7+
+# Elevated PowerShell 7+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\bootstrap\workspace-windows.ps1
+```
+
+Installs: Git · GitHub CLI · WezTerm · Neovim · VS Code (+ Claude Code & Copilot extensions) · Claude for Desktop · Claude CLI · GitHub Copilot CLI
+
+**2. Dotfiles setup** — symlinks configs and sets up shell (run after workspace install):
+
+```powershell
+.\bootstrap\windows.ps1
+```
+
+Full sequence on a fresh machine:
+
+```powershell
 git clone https://github.com/<you>/dotfiles $env:USERPROFILE\dotfiles
 cd $env:USERPROFILE\dotfiles
 Set-ExecutionPolicy Bypass -Scope Process -Force
-.\bootstrap\windows.ps1
+.\bootstrap\workspace-windows.ps1   # install tools
+.\bootstrap\windows.ps1             # apply dotfiles
 ```
 
 > **Symlinks on Windows**: requires Developer Mode (`Settings → System → Developer Mode`) or an elevated prompt. The bootstrap script handles this. Without elevation, run `.\bootstrap\windows.ps1 -SymlinksOnly` after enabling Developer Mode.
