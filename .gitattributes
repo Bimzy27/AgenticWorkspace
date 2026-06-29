@@ -1,0 +1,25 @@
+# Normalize line endings to LF in the repo; checkout handles OS conversion
+* text=auto eol=lf
+
+# Shell scripts must stay LF on all platforms
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows scripts use CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Lua files: LF
+*.lua text eol=lf
+
+# Configs: LF
+*.conf text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+# Symlinks: track as symlinks on platforms that support them
+CLAUDE.md symlink=true

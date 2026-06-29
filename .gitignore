@@ -1,0 +1,38 @@
+# Claude Code local settings (machine-specific)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~
+
+# Neovim lazy-lock (optional: commit to pin plugin versions)
+# .config/nvim/lazy-lock.json
+
+# Local env/secrets
+.env
+.env.local
+*.local
+
+# Logs
+*.log
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Go
+vendor/
+
+# Playground (scratch space)
+playground/
