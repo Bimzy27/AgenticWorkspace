@@ -1,142 +1,108 @@
-# dotfiles
+# AgenticWorkspace
 
-Agentic engineering dotfiles — multi-OS (Windows 11 + Linux/Omarchy + phone via SSH).
+Dotfiles and agent instructions for an agentic engineering workflow on Windows 11, with optional Linux/Omarchy support.
 
-Emulates the L8 agentic engineering workflow: tmux session splits with an agent on the left and Neovim on the right, phone access via Tailscale + mosh, parallel tasks via git worktrees.
+WezTerm handles terminal multiplexing natively (tabs, panes, copy mode) via a Ctrl+Space leader key.
+Claude Code is the primary AI agent harness.
 
 ## Structure
 
 ```
 .
-├── AGENTS.md                  # Source of truth — agent instructions for all harnesses
-├── CLAUDE.md                  # Symlink → AGENTS.md (Claude Code reads this)
+├── setup.ps1                       # One-shot Windows setup (runs all scripts below)
+├── AGENTS.md                       # Agent instructions (all harnesses)
+├── CLAUDE.md                       # Agent instructions (Claude Code)
 ├── .config/
-│   ├── wezterm/wezterm.lua    # Terminal: multi-OS, frameless, Tokyo Night
-│   ├── tmux/tmux.conf         # Multiplexer: Ctrl+a prefix, vi keys, top status bar
-│   └── nvim/                  # Neovim: lazy.nvim, oil.nvim, neogit, snacks.nvim, LSP
+│   ├── wezterm/wezterm.lua         # Terminal: tabs/panes, Tokyo Night, Ctrl+Space leader
+│   └── nvim/                       # Neovim: lazy.nvim, oil.nvim, neogit, snacks.nvim, LSP
 ├── scripts/
-│   ├── tdev.sh                # Launch tmux dev session (agent left | nvim right)
-│   └── sync.sh                # Pull latest and re-apply symlinks
+│   └── install-configs.ps1         # Symlink configs into system paths, install fonts
 └── bootstrap/
-    ├── linux.sh               # Arch/Omarchy or Debian/Ubuntu setup
-    └── windows.ps1            # Windows 11 setup (requires elevated prompt)
+    ├── workspace-windows.ps1       # Install dev tools (winget, npm, gh extensions)
+    └── windows.ps1                 # Symlink dotfiles, set up shell profile
 ```
 
 ## Quick start
 
+### Windows 11
+
+Run a single script from an elevated PowerShell 7+ prompt (or with Developer Mode enabled):
+
+```powershell
+git clone https://github.com/Bimzy27/AgenticWorkspace $env:USERPROFILE\AgenticWorkspace
+cd $env:USERPROFILE\AgenticWorkspace
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\setup.ps1
+```
+
+`setup.ps1` runs in order:
+1. `bootstrap\workspace-windows.ps1` - installs all dev tools via winget/npm/gh
+2. `bootstrap\windows.ps1` - symlinks dotfiles, sets up PowerShell profile
+3. `scripts\install-configs.ps1` - symlinks configs into system paths, installs IosevkaTerm Nerd Font
+
+Each step is idempotent - safe to re-run.
+
+> **Symlinks on Windows**: requires Developer Mode (`Settings -> System -> Developer Mode`) or an elevated prompt.
+
+After setup:
+
+```powershell
+gh auth login           # authenticate GitHub CLI
+claude                  # authenticate Claude Code
+```
+
 ### Linux / Omarchy
 
 ```bash
-git clone https://github.com/<you>/dotfiles ~/dotfiles
-cd ~/dotfiles
+git clone https://github.com/Bimzy27/AgenticWorkspace ~/AgenticWorkspace
+cd ~/AgenticWorkspace
 bash bootstrap/linux.sh
 ```
 
-### Windows 11
-
-Two scripts, run in order:
-
-**1. Workspace installer** — installs all development tools (run once on a fresh machine):
-
-```powershell
-# Elevated PowerShell 7+
-Set-ExecutionPolicy Bypass -Scope Process -Force
-.\bootstrap\workspace-windows.ps1
-```
-
-Installs: Git · GitHub CLI · WezTerm · Neovim · VS Code (+ Claude Code & Copilot extensions) · Claude for Desktop · Claude CLI · GitHub Copilot CLI
-
-**2. Dotfiles setup** — symlinks configs and sets up shell (run after workspace install):
-
-```powershell
-.\bootstrap\windows.ps1
-```
-
-Full sequence on a fresh machine:
-
-```powershell
-git clone https://github.com/<you>/dotfiles $env:USERPROFILE\dotfiles
-cd $env:USERPROFILE\dotfiles
-Set-ExecutionPolicy Bypass -Scope Process -Force
-.\bootstrap\workspace-windows.ps1   # install tools
-.\bootstrap\windows.ps1             # apply dotfiles
-```
-
-> **Symlinks on Windows**: requires Developer Mode (`Settings → System → Developer Mode`) or an elevated prompt. The bootstrap script handles this. Without elevation, run `.\bootstrap\windows.ps1 -SymlinksOnly` after enabling Developer Mode.
-
 ### Phone (remote access)
 
-1. Install [Tailscale](https://tailscale.com) on your phone and your desktop.
-2. Install a terminal app: [Blink Shell](https://blink.sh) (iOS) or [Termux](https://termux.dev) (Android).
-3. SSH or mosh into your desktop by its Tailscale IP/hostname:
+1. Install [Tailscale](https://tailscale.com) on your phone and desktop.
+2. Install a terminal: [Blink Shell](https://blink.sh) (iOS) or [Termux](https://termux.dev) (Android).
+3. SSH into your desktop via Tailscale hostname:
    ```
-   mosh <your-machine-tailscale-name>
-   ```
-4. Attach to your running tmux session:
-   ```
-   tmux attach -t dev
+   ssh <your-machine-tailscale-name>
    ```
 
-## Workflow
+## WezTerm keybindings
 
-### Starting a dev session
+Leader key: `Ctrl+Space`
 
-```bash
-tdev [session-name] [project-dir]
-# e.g.:
-tdev myproject ~/code/myproject
-```
-
-This creates a tmux session with:
-- **Left pane (60%)**: Claude Code (or OpenCode)
-- **Right pane (40%)**: Neovim
-
-### Parallel agent tasks
-
-Each parallel task gets its own git worktree:
-
-```bash
-git worktree add ../myproject-feat-x feat/x
-tdev feat-x ../myproject-feat-x
-```
-
-### Syncing dotfiles
-
-```bash
-dotfiles-sync   # or: bash ~/dotfiles/scripts/sync.sh
-```
-
-## AGENTS.md / CLAUDE.md
-
-`AGENTS.md` is the single source of truth for all agent instructions. `CLAUDE.md` is a symlink to it, so both Claude Code and OpenCode/Codex read the same file.
-
-**To update agent instructions**: edit `AGENTS.md` only. The symlink ensures all harnesses see the change immediately.
-
-The global `~/.claude/CLAUDE.md` is also symlinked to `AGENTS.md`, so these instructions apply to every project unless overridden by a project-level `AGENTS.md`.
+| Key | Action |
+|-----|--------|
+| `Leader + \` | Split pane horizontally |
+| `Leader + -` | Split pane vertically |
+| `Leader + h/j/k/l` | Navigate panes (vim-style) |
+| `Leader + H/J/K/L` | Resize pane |
+| `Leader + z` | Zoom/unzoom pane |
+| `Leader + x` | Close pane |
+| `Leader + c` | New tab |
+| `Leader + n/p` | Next/previous tab |
+| `Leader + 1-5` | Jump to tab by number |
+| `Leader + ,` | Rename tab |
+| `Leader + [` | Enter copy mode (vi keys) |
+| `Leader + d` | Detach mux session |
 
 ## Tools
 
 | Tool | Purpose |
 |------|---------|
-| [WezTerm](https://wezfurlong.org/wezterm/) | Terminal (multi-OS, GPU-accelerated) |
-| [tmux](https://github.com/tmux/tmux) | Session/pane management |
+| [WezTerm](https://wezfurlong.org/wezterm/) | Terminal - GPU-accelerated, native tabs/panes |
 | [Neovim](https://neovim.io) | Editor |
 | [Claude Code](https://claude.ai/code) | Primary AI agent harness |
-| [OpenCode](https://opencode.ai) | Secondary AI agent harness |
+| [GitHub CLI](https://cli.github.com) | Git forge integration |
 | [Tailscale](https://tailscale.com) | Private network for remote access |
-| [mosh](https://mosh.org) | Stable SSH over mobile connections |
 | [lazygit](https://github.com/jesseduffield/lazygit) | TUI git client |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast grep |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart `cd` |
 
-## Neovim keymaps (highlights)
+## Agent instructions
 
-| Key | Action |
-|-----|--------|
-| `-` | Open parent dir (oil.nvim) |
-| `<leader>ff` | Find files (snacks) |
-| `<leader>fg` | Grep (snacks) |
-| `<leader>gg` | Neogit |
-| `<leader>gd` | Diff view |
-| `<Space>` | Leader key |
-| `jk` / `kj` | Exit insert mode |
+`AGENTS.md` and `CLAUDE.md` contain the agent instructions read by all harnesses.
+`scripts/install-configs.ps1` symlinks both into `~/.claude/` so the instructions apply globally across every project.
+
+To update agent instructions, edit `AGENTS.md` or `CLAUDE.md` directly.

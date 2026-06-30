@@ -31,11 +31,6 @@ Link-Item "$DOTFILES\.config\wezterm\wezterm.lua" "$env:USERPROFILE\.wezterm.lua
 # Neovim - AppData\Local\nvim
 Link-Item "$DOTFILES\.config\nvim" "$env:LOCALAPPDATA\nvim"
 
-# Tmux (via WSL or Git Bash - symlink to accessible path)
-$tmuxDest = "$env:USERPROFILE\.config\tmux"
-if (-not (Test-Path $tmuxDest)) { New-Item -ItemType Directory -Path $tmuxDest -Force | Out-Null }
-Link-Item "$DOTFILES\.config\tmux\tmux.conf" "$tmuxDest\tmux.conf"
-
 # AGENTS.md → Claude global config
 $claudeDir = "$env:USERPROFILE\.claude"
 if (-not (Test-Path $claudeDir)) { New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null }
