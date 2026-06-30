@@ -57,13 +57,31 @@ function Install-Link {
     }
 }
 
-# ── Claude global instructions ────────────────────────────────────────────────
+# ── Claude global instructions + settings ─────────────────────────────────────
 
 Write-Header "Claude"
-Write-Step "~\.claude\CLAUDE.md"
-Install-Link "$REPO\CLAUDE.md"  "$env:USERPROFILE\.claude\CLAUDE.md"
+
+# AGENTS.md is the single source of truth; both Claude Code and OpenCode read it
 Write-Step "~\.claude\AGENTS.md"
 Install-Link "$REPO\AGENTS.md"  "$env:USERPROFILE\.claude\AGENTS.md"
+Write-Step "~\.claude\CLAUDE.md  (-> AGENTS.md)"
+Install-Link "$REPO\AGENTS.md"  "$env:USERPROFILE\.claude\CLAUDE.md"
+
+# CLAUDE.md in the repo itself is a local symlink to AGENTS.md
+$repoClaudeMd = "$REPO\CLAUDE.md"
+if (-not (Test-Path $repoClaudeMd)) {
+    try {
+        New-Item -ItemType SymbolicLink -Path $repoClaudeMd -Target "$REPO\AGENTS.md" -ErrorAction Stop | Out-Null
+        Write-Ok "$repoClaudeMd -> AGENTS.md"
+    } catch {
+        Write-Fail "Could not create repo CLAUDE.md symlink: $_"
+    }
+} else {
+    Write-Ok "CLAUDE.md symlink already exists"
+}
+
+Write-Step "~\.claude\settings.json"
+Install-Link "$REPO\claude\settings.json"  "$env:USERPROFILE\.claude\settings.json"
 
 # ── WezTerm ───────────────────────────────────────────────────────────────────
 

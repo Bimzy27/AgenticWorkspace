@@ -3,6 +3,7 @@
 Dotfiles and agent instructions for an agentic engineering workflow on Windows 11, with optional Linux/Omarchy support.
 
 WezTerm handles terminal multiplexing natively (tabs, panes, copy mode) via a Ctrl+Space leader key.
+Catppuccin Mocha is the color scheme across WezTerm, Neovim, and Claude Code.
 Claude Code is the primary AI agent harness.
 
 ## Structure
@@ -10,10 +11,12 @@ Claude Code is the primary AI agent harness.
 ```
 .
 ├── setup.ps1                       # One-shot Windows setup (runs all scripts below)
-├── AGENTS.md                       # Agent instructions (all harnesses)
-├── CLAUDE.md                       # Agent instructions (Claude Code)
+├── AGENTS.md                       # Agent instructions - single source of truth
+├── CLAUDE.md                       # Symlink to AGENTS.md (created by install-configs.ps1)
+├── claude/
+│   └── settings.json               # Claude Code global settings (theme, etc.)
 ├── .config/
-│   ├── wezterm/wezterm.lua         # Terminal: tabs/panes, Tokyo Night, Ctrl+Space leader
+│   ├── wezterm/wezterm.lua         # Terminal: tabs/panes, Catppuccin Mocha, fullscreen
 │   └── nvim/                       # Neovim: lazy.nvim, oil.nvim, neogit, snacks.nvim, LSP
 ├── scripts/
 │   └── install-configs.ps1         # Symlink configs into system paths, install fonts
@@ -102,7 +105,9 @@ Leader key: `Ctrl+Space`
 
 ## Agent instructions
 
-`AGENTS.md` and `CLAUDE.md` contain the agent instructions read by all harnesses.
-`scripts/install-configs.ps1` symlinks both into `~/.claude/` so the instructions apply globally across every project.
+`AGENTS.md` is the single source of truth for all agent instructions.
+`CLAUDE.md` is a symlink to `AGENTS.md`, created by `scripts/install-configs.ps1` at install time - it is not tracked in git.
 
-To update agent instructions, edit `AGENTS.md` or `CLAUDE.md` directly.
+`install-configs.ps1` also symlinks `AGENTS.md` into `~/.claude/` as both `CLAUDE.md` and `AGENTS.md` so the instructions apply globally across every project.
+
+To update agent instructions, edit `AGENTS.md` only.

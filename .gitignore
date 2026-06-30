@@ -1,6 +1,9 @@
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
 
+# CLAUDE.md is a symlink to AGENTS.md, created by scripts/install-configs.ps1
+CLAUDE.md
+
 # OS
 .DS_Store
 Thumbs.db

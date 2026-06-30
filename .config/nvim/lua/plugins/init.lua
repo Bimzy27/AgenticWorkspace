@@ -1,13 +1,14 @@
 return {
   -- Colorscheme
   {
-    'folke/tokyonight.nvim',
+    'catppuccin/nvim',
+    name = 'catppuccin',
     lazy = false,
     priority = 1000,
-    opts = { style = 'night', transparent = false },
+    opts = { flavour = 'mocha' },
     config = function(_, opts)
-      require('tokyonight').setup(opts)
-      vim.cmd('colorscheme tokyonight')
+      require('catppuccin').setup(opts)
+      vim.cmd('colorscheme catppuccin')
     end,
   },
 
@@ -240,7 +241,7 @@ return {
     event = 'VeryLazy',
     opts = {
       options = {
-        theme = 'tokyonight',
+        theme = 'catppuccin',
         component_separators = '',
         section_separators = { left = '', right = '' },
       },

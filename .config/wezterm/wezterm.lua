@@ -10,6 +10,12 @@ local is_linux = wezterm.target_triple:find('linux') ~= nil
 -- config.unix_domains = { { name = 'main' } }
 -- config.default_gui_startup_args = { 'connect', 'main' }
 
+-- Launch fullscreen
+wezterm.on('gui-startup', function(cmd)
+  local _, _, window = wezterm.mux.spawn_window(cmd or {})
+  window:gui_window():toggle_fullscreen()
+end)
+
 -- Appearance: frameless single-window, no distractions
 config.window_decorations = is_windows and 'INTEGRATED_BUTTONS|RESIZE' or 'NONE'
 config.enable_tab_bar = true
@@ -24,7 +30,7 @@ config.font_size = is_windows and 12.0 or 14.0
 config.line_height = 1.1
 
 -- Color scheme
-config.color_scheme = 'Tokyo Night'
+config.color_scheme = 'Catppuccin Mocha'
 
 -- Performance
 config.max_fps = 120
