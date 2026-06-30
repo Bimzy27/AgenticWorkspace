@@ -62,7 +62,6 @@ $packages = @(
     @{ Id = 'JesseDuffield.lazygit';     Name = 'lazygit' },
     @{ Id = 'OpenJS.NodeJS.LTS';         Name = 'Node.js LTS' },
     @{ Id = 'GoLang.Go';                 Name = 'Go' },
-    @{ Id = 'Tailscale.Tailscale';       Name = 'Tailscale' },
     @{ Id = 'Microsoft.PowerShell';      Name = 'PowerShell 7' }
 )
 
@@ -97,4 +96,3 @@ if (-not (Select-String -Path $PROFILE -Pattern 'dotfiles' -Quiet)) {
 
 Write-Host ""
 Write-Host "Bootstrap complete. Restart your terminal."
-Write-Host "Then run: tailscale up   (to join your Tailscale network)"

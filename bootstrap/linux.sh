@@ -56,7 +56,7 @@ if command -v pacman &>/dev/null; then
   sudo pacman -S --needed --noconfirm \
     neovim tmux git curl wget unzip \
     ripgrep fd fzf zoxide bat eza lazygit \
-    mosh tailscale openssh \
+    mosh openssh \
     nodejs npm python python-pip go rust \
     wezterm
 
@@ -105,14 +105,6 @@ export PATH="$HOME/.local/bin:$PATH"
 eval "$(zoxide init zsh)"
 EOF
   echo "Updated $SHELL_RC"
-fi
-
-# ── Tailscale ────────────────────────────────────────────────────────────────
-
-if ! command -v tailscale &>/dev/null; then
-  echo ""
-  echo "Tailscale not found. Install from https://tailscale.com/download/linux"
-  echo "Then run: sudo tailscale up"
 fi
 
 echo ""

@@ -62,15 +62,6 @@ cd ~/AgenticWorkspace
 bash bootstrap/linux.sh
 ```
 
-### Phone (remote access)
-
-1. Install [Tailscale](https://tailscale.com) on your phone and desktop.
-2. Install a terminal: [Blink Shell](https://blink.sh) (iOS) or [Termux](https://termux.dev) (Android).
-3. SSH into your desktop via Tailscale hostname:
-   ```
-   ssh <your-machine-tailscale-name>
-   ```
-
 ## WezTerm keybindings
 
 Leader key: `Ctrl+Space`
@@ -98,7 +89,6 @@ Leader key: `Ctrl+Space`
 | [Neovim](https://neovim.io) | Editor |
 | [Claude Code](https://claude.ai/code) | Primary AI agent harness |
 | [GitHub CLI](https://cli.github.com) | Git forge integration |
-| [Tailscale](https://tailscale.com) | Private network for remote access |
 | [lazygit](https://github.com/jesseduffield/lazygit) | TUI git client |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast grep |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart `cd` |
