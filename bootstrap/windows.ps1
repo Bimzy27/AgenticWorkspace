@@ -71,11 +71,15 @@ foreach ($pkg in $packages) {
     if (-not $?) { Write-Warning "  $($pkg.Name) may already be installed or failed — continuing." }
 }
 
-# ── Claude Code ───────────────────────────────────────────────────────────────
+# ── Agent CLIs (npm) ──────────────────────────────────────────────────────────
 
 Write-Host ""
-Write-Host "Installing Claude Code..."
-npm install -g @anthropic-ai/claude-code
+Write-Host "Installing agent CLIs via npm..."
+foreach ($cli in @('@anthropic-ai/claude-code', 'opencode-ai', '@fission-ai/openspec')) {
+    Write-Host "  Installing $cli..."
+    npm install -g $cli
+    if (-not $?) { Write-Warning "  $cli install failed — continuing." }
+}
 
 # ── PowerShell profile ────────────────────────────────────────────────────────
 
@@ -92,6 +96,28 @@ if (-not (Test-Path $PROFILE)) {
 if (-not (Select-String -Path $PROFILE -Pattern 'dotfiles' -Quiet)) {
     Add-Content -Path $PROFILE -Value $profileContent
     Write-Host "Updated PowerShell profile: $PROFILE"
+}
+
+$manContent = @'
+
+# man - fall back to --help for non-cmdlets (nvim, git, etc.)
+Remove-Alias man -Force -ErrorAction SilentlyContinue
+function man {
+    param([string]$Command)
+    $cmdlet = Get-Command $Command -ErrorAction SilentlyContinue
+    if ($cmdlet -and $cmdlet.CommandType -in 'Cmdlet', 'Function', 'Alias') {
+        Get-Help $Command -Full
+    } elseif ($cmdlet) {
+        & $Command --help
+    } else {
+        Write-Error "man: no entry for $Command"
+    }
+}
+'@
+
+if (-not (Select-String -Path $PROFILE -Pattern 'fall back to --help' -Quiet)) {
+    Add-Content -Path $PROFILE -Value $manContent
+    Write-Host "Updated PowerShell profile: added man function"
 }
 
 Write-Host ""

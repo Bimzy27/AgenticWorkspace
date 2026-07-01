@@ -83,6 +83,12 @@ if (-not (Test-Path $repoClaudeMd)) {
 Write-Step "~\.claude\settings.json"
 Install-Link "$REPO\claude\settings.json"  "$env:USERPROFILE\.claude\settings.json"
 
+# ── OpenCode ──────────────────────────────────────────────────────────────────
+
+Write-Header "OpenCode"
+Write-Step "~\.config\opencode\opencode.json"
+Install-Link "$REPO\.config\opencode\opencode.json"  "$env:USERPROFILE\.config\opencode\opencode.json"
+
 # ── WezTerm ───────────────────────────────────────────────────────────────────
 
 Write-Header "WezTerm"

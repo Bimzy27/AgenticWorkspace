@@ -17,6 +17,7 @@ Claude Code is the primary AI agent harness.
 │   └── settings.json               # Claude Code global settings (theme, etc.)
 ├── .config/
 │   ├── wezterm/wezterm.lua         # Terminal: tabs/panes, Catppuccin Mocha, fullscreen
+│   ├── opencode/opencode.json      # OpenCode: theme, model, shared AGENTS.md instructions
 │   └── nvim/                       # Neovim: lazy.nvim, oil.nvim, neogit, snacks.nvim, LSP
 ├── scripts/
 │   └── install-configs.ps1         # Symlink configs into system paths, install fonts
@@ -88,6 +89,8 @@ Leader key: `Ctrl+Space`
 | [WezTerm](https://wezfurlong.org/wezterm/) | Terminal - GPU-accelerated, native tabs/panes |
 | [Neovim](https://neovim.io) | Editor |
 | [Claude Code](https://claude.ai/code) | Primary AI agent harness |
+| [OpenCode](https://opencode.ai) | Alternative terminal AI agent |
+| [OpenSpec](https://github.com/Fission-AI/OpenSpec) | Spec-driven development workflow |
 | [GitHub CLI](https://cli.github.com) | Git forge integration |
 | [lazygit](https://github.com/jesseduffield/lazygit) | TUI git client |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast grep |

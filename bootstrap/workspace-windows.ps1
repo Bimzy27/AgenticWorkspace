@@ -11,6 +11,8 @@
       - Visual Studio Code + Claude Code extension + GitHub Copilot extensions
       - Claude for Desktop
       - Claude CLI  (@anthropic-ai/claude-code)
+      - OpenCode CLI  (opencode-ai)
+      - OpenSpec CLI  (@fission-ai/openspec)
       - GitHub Copilot CLI  (gh extension)
 
     Safe to re-run — already-installed packages are skipped.
@@ -193,6 +195,31 @@ if (Get-Command npm -ErrorAction SilentlyContinue) {
     Write-Warn "  npm install -g @anthropic-ai/claude-code"
 }
 
+# ── OpenCode + OpenSpec CLIs ──────────────────────────────────────────────────
+
+Write-Header "OpenCode + OpenSpec CLIs"
+
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    $npmClis = @(
+        @{ Pkg = 'opencode-ai';           Name = 'OpenCode CLI'; Cmd = 'opencode' },
+        @{ Pkg = '@fission-ai/openspec';  Name = 'OpenSpec CLI'; Cmd = 'openspec' }
+    )
+
+    foreach ($cli in $npmClis) {
+        Write-Step "Installing $($cli.Name) ($($cli.Pkg))..."
+        npm install -g $cli.Pkg
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "$($cli.Name) installed"
+        } else {
+            Write-Warn "$($cli.Name) install failed — try manually: npm install -g $($cli.Pkg)"
+        }
+    }
+} else {
+    Write-Warn "npm not on PATH. Restart your terminal after Node.js install, then run:"
+    Write-Warn "  npm install -g opencode-ai"
+    Write-Warn "  npm install -g @fission-ai/openspec"
+}
+
 # ── GitHub Copilot CLI ────────────────────────────────────────────────────────
 
 Write-Header "GitHub Copilot CLI  (gh extension)"
@@ -236,8 +263,10 @@ $checks = @(
     @{ Cmd = 'nvim';    Label = 'Neovim' },
     @{ Cmd = 'node';    Label = 'Node.js' },
     @{ Cmd = 'npm';     Label = 'npm' },
-    @{ Cmd = 'claude';  Label = 'Claude CLI' },
-    @{ Cmd = 'code';    Label = 'VS Code' }
+    @{ Cmd = 'claude';   Label = 'Claude CLI' },
+    @{ Cmd = 'opencode'; Label = 'OpenCode CLI' },
+    @{ Cmd = 'openspec'; Label = 'OpenSpec CLI' },
+    @{ Cmd = 'code';     Label = 'VS Code' }
 )
 
 Update-Path
