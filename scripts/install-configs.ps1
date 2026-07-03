@@ -95,6 +95,20 @@ Write-Header "WezTerm"
 Write-Step "~\.wezterm.lua"
 Install-Link "$REPO\.config\wezterm\wezterm.lua"  "$env:USERPROFILE\.wezterm.lua"
 
+# Mux server logon task: keeps sessions alive across GUI restarts.
+# wezterm.lua connects to the 'main' unix domain served by this process.
+Write-Step "Scheduled task: WezTermMuxServer"
+$muxExe = "$env:ProgramFiles\WezTerm\wezterm-mux-server.exe"
+if (Test-Path $muxExe) {
+    $action   = New-ScheduledTaskAction -Execute $muxExe -Argument '--daemonize' -WorkingDirectory $env:USERPROFILE
+    $trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan)
+    Register-ScheduledTask -TaskName 'WezTermMuxServer' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
+    Write-Ok "Scheduled task 'WezTermMuxServer' registered"
+} else {
+    Write-Fail "wezterm-mux-server.exe not found, skipping mux logon task"
+}
+
 # ── Neovim ────────────────────────────────────────────────────────────────────
 
 Write-Header "Neovim"

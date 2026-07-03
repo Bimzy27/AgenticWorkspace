@@ -5,15 +5,27 @@ local act = wezterm.action
 local is_windows = wezterm.target_triple:find('windows') ~= nil
 local is_linux = wezterm.target_triple:find('linux') ~= nil
 
--- Mux: persistent sessions survive GUI close (named pipe on Windows, socket on Linux)
--- Run `wezterm-mux-server --daemonize` first, then uncomment to enable persistent sessions.
--- config.unix_domains = { { name = 'main' } }
--- config.default_gui_startup_args = { 'connect', 'main' }
+-- Mux: persistent sessions survive GUI close (named pipe on Windows, socket on Linux).
+-- The GUI auto-starts wezterm-mux-server on connect if it is not running; on Windows
+-- the 'WezTermMuxServer' logon task (scripts/install-configs.ps1) also starts it.
+config.unix_domains = { { name = 'main' } }
+config.default_gui_startup_args = { 'connect', 'main' }
 
--- Launch fullscreen
+-- Launch fullscreen. 'gui-startup' only fires for plain `wezterm start`; when the GUI
+-- launches via `connect` (default_gui_startup_args above) 'gui-attached' fires instead.
+-- The is_full_screen guard prevents a double toggle when both events fire.
 wezterm.on('gui-startup', function(cmd)
   local _, _, window = wezterm.mux.spawn_window(cmd or {})
   window:gui_window():toggle_fullscreen()
+end)
+
+wezterm.on('gui-attached', function()
+  for _, window in ipairs(wezterm.mux.all_windows()) do
+    local gui = window:gui_window()
+    if gui and not gui:get_dimensions().is_full_screen then
+      gui:toggle_fullscreen()
+    end
+  end
 end)
 
 -- Appearance: frameless single-window, no distractions
