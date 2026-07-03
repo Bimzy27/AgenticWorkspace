@@ -59,33 +59,35 @@ config.scrollback_lines = 10000
 -- Leader key (Ctrl+a, like tmux)
 config.leader = { key = 'Space', mods = 'CTRL', timeout_milliseconds = 1000 }
 
-config.keys = {
+-- Leader bindings: single source of truth for config.keys AND the hotkey overlay.
+-- Add/remove bindings here only; both the keybinding and its overlay entry follow.
+local mux_bindings = {
   -- Pane splits
-  { key = '\\', mods = 'LEADER', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = '-',  mods = 'LEADER', action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
+  { key = '\\', desc = 'Split horizontal', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = '-',  desc = 'Split vertical',   action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
 
   -- Pane navigation (vim-style)
-  { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection('Left') },
-  { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection('Down') },
-  { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection('Up') },
-  { key = 'l', mods = 'LEADER', action = act.ActivatePaneDirection('Right') },
+  { key = 'h', desc = 'Focus pane left',  action = act.ActivatePaneDirection('Left') },
+  { key = 'j', desc = 'Focus pane down',  action = act.ActivatePaneDirection('Down') },
+  { key = 'k', desc = 'Focus pane up',    action = act.ActivatePaneDirection('Up') },
+  { key = 'l', desc = 'Focus pane right', action = act.ActivatePaneDirection('Right') },
 
   -- Pane resize
-  { key = 'H', mods = 'LEADER', action = act.AdjustPaneSize { 'Left',  5 } },
-  { key = 'J', mods = 'LEADER', action = act.AdjustPaneSize { 'Down',  5 } },
-  { key = 'K', mods = 'LEADER', action = act.AdjustPaneSize { 'Up',    5 } },
-  { key = 'L', mods = 'LEADER', action = act.AdjustPaneSize { 'Right', 5 } },
+  { key = 'H', desc = 'Resize pane left',  action = act.AdjustPaneSize { 'Left',  5 } },
+  { key = 'J', desc = 'Resize pane down',  action = act.AdjustPaneSize { 'Down',  5 } },
+  { key = 'K', desc = 'Resize pane up',    action = act.AdjustPaneSize { 'Up',    5 } },
+  { key = 'L', desc = 'Resize pane right', action = act.AdjustPaneSize { 'Right', 5 } },
 
   -- Pane zoom / close
-  { key = 'z', mods = 'LEADER', action = act.TogglePaneZoomState },
-  { key = 'x', mods = 'LEADER', action = act.CloseCurrentPane { confirm = true } },
+  { key = 'z', desc = 'Toggle pane zoom', action = act.TogglePaneZoomState },
+  { key = 'x', desc = 'Close pane',       action = act.CloseCurrentPane { confirm = true } },
 
   -- Tabs
-  { key = 'c', mods = 'LEADER', action = act.SpawnTab 'CurrentPaneDomain' },
-  { key = 'w', mods = 'LEADER', action = act.CloseCurrentTab { confirm = true } },
-  { key = 'n', mods = 'LEADER', action = act.ActivateTabRelative(1) },
-  { key = 'p', mods = 'LEADER', action = act.ActivateTabRelative(-1) },
-  { key = ',', mods = 'LEADER', action = act.PromptInputLine {
+  { key = 'c', desc = 'New tab',      action = act.SpawnTab 'CurrentPaneDomain' },
+  { key = 'w', desc = 'Close tab',    action = act.CloseCurrentTab { confirm = true } },
+  { key = 'n', desc = 'Next tab',     action = act.ActivateTabRelative(1) },
+  { key = 'p', desc = 'Previous tab', action = act.ActivateTabRelative(-1) },
+  { key = ',', desc = 'Rename tab',   action = act.PromptInputLine {
     description = 'Rename tab',
     action = wezterm.action_callback(function(window, _, line)
       if line then window:active_tab():set_title(line) end
@@ -93,18 +95,52 @@ config.keys = {
   }},
 
   -- Jump to tab by number
-  { key = '1', mods = 'LEADER', action = act.ActivateTab(0) },
-  { key = '2', mods = 'LEADER', action = act.ActivateTab(1) },
-  { key = '3', mods = 'LEADER', action = act.ActivateTab(2) },
-  { key = '4', mods = 'LEADER', action = act.ActivateTab(3) },
-  { key = '5', mods = 'LEADER', action = act.ActivateTab(4) },
+  { key = '1', desc = 'Go to tab 1', action = act.ActivateTab(0) },
+  { key = '2', desc = 'Go to tab 2', action = act.ActivateTab(1) },
+  { key = '3', desc = 'Go to tab 3', action = act.ActivateTab(2) },
+  { key = '4', desc = 'Go to tab 4', action = act.ActivateTab(3) },
+  { key = '5', desc = 'Go to tab 5', action = act.ActivateTab(4) },
 
   -- Mux: detach session
-  { key = 'd', mods = 'LEADER', action = act.DetachDomain 'CurrentPaneDomain' },
+  { key = 'd', desc = 'Detach session', action = act.DetachDomain 'CurrentPaneDomain' },
 
   -- Copy mode
-  { key = '[', mods = 'LEADER', action = act.ActivateCopyMode },
+  { key = '[', desc = 'Copy mode', action = act.ActivateCopyMode },
+
+  -- Hotkey overlay (action assigned below, after hotkey_overlay is defined,
+  -- so the overlay's choice list includes this entry too)
+  { key = '?', desc = 'Show this hotkey overlay' },
 }
+
+-- Hotkey overlay (LEADER ?): fuzzy-searchable cheatsheet of every leader binding.
+-- Selecting an entry executes it, which-key style.
+local function hotkey_overlay()
+  local choices = {}
+  for i, b in ipairs(mux_bindings) do
+    table.insert(choices, {
+      id = tostring(i),
+      label = string.format('LEADER %-4s %s', b.key, b.desc),
+    })
+  end
+  return act.InputSelector {
+    title = 'WezTerm Mux Hotkeys',
+    choices = choices,
+    fuzzy = true,
+    fuzzy_description = 'Filter hotkeys: ',
+    action = wezterm.action_callback(function(window, pane, id)
+      if id then
+        window:perform_action(mux_bindings[tonumber(id)].action, pane)
+      end
+    end),
+  }
+end
+
+mux_bindings[#mux_bindings].action = hotkey_overlay()
+
+config.keys = {}
+for _, b in ipairs(mux_bindings) do
+  table.insert(config.keys, { key = b.key, mods = 'LEADER', action = b.action })
+end
 
 -- Copy mode: vi keys
 config.key_tables = {
