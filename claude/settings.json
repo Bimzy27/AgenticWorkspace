@@ -1,3 +1,4 @@
 {
-  "theme": "dark"
+  "model": "claude-fable-5[1m]",
+  "theme": "auto"
 }
