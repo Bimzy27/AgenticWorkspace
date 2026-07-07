@@ -1,3 +1,6 @@
+-- These keymaps are mirrored in the WezTerm LEADER ? hotkey overlay
+-- (.config/wezterm/wezterm.lua, reference_sections NVIM) - update both together.
+
 local map = vim.keymap.set
 
 vim.g.mapleader = ' '

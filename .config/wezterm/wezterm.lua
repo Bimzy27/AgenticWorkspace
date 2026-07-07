@@ -120,28 +120,95 @@ local mux_bindings = {
   { key = '[', desc = 'Copy mode', action = act.ActivateCopyMode },
 
   -- Hotkey overlay (action assigned below, after hotkey_overlay is defined,
-  -- so the overlay's choice list includes this entry too)
-  { key = '?', desc = 'Show this hotkey overlay' },
+  -- so the overlay's choice list includes this entry too).
+  -- SHIFT must be explicit: LEADER + shifted punctuation is not normalized
+  -- the way shifted letters are (wezterm/wezterm#394).
+  { key = '?', mods = 'LEADER|SHIFT', desc = 'Show this hotkey overlay' },
 }
 
--- Hotkey overlay (LEADER ?): fuzzy-searchable cheatsheet of every leader binding.
--- Selecting an entry executes it, which-key style.
+-- Reference sections: shown in the hotkey overlay for lookup only. These are
+-- not WezTerm bindings and never reach config.keys; selecting one just
+-- dismisses the overlay.
+local reference_sections = {
+  {
+    -- Mirrors the custom keymaps in .config/nvim/lua/keymaps.lua (curated by
+    -- hand, not parsed) - update both together.
+    name = 'NVIM',
+    entries = {
+      { key = '<Space>',        desc = 'Leader key' },
+      { key = 'jk / kj',        desc = 'Exit insert mode' },
+      { key = '<C-h/j/k/l>',    desc = 'Focus window left/down/up/right' },
+      { key = '<C-Arrows>',     desc = 'Resize window' },
+      { key = 'J / K (visual)', desc = 'Move selection down/up' },
+      { key = '<C-d> / <C-u>',  desc = 'Half-page scroll, centered' },
+      { key = 'n / N',          desc = 'Next/prev match, centered' },
+      { key = 'p (visual)',     desc = 'Paste without clobbering register' },
+      { key = '<Esc>',          desc = 'Clear search highlight' },
+      { key = '<Ldr>qo / qc',   desc = 'Open/close quickfix' },
+      { key = ']q / [q',        desc = 'Next/prev quickfix item' },
+      { key = '<S-l> / <S-h>',  desc = 'Next/prev buffer' },
+      { key = '<Ldr>bd',        desc = 'Delete buffer' },
+      { key = '<C-s>',          desc = 'Save file' },
+      { key = '<Ldr>sv / sh',   desc = 'Vertical/horizontal split' },
+      { key = '<Ldr>sc',        desc = 'Close split' },
+      { key = ']d / [d',        desc = 'Next/prev diagnostic' },
+      { key = '<Ldr>d',         desc = 'Show diagnostic float' },
+    },
+  },
+  {
+    -- Claude Code CLI defaults (code.claude.com/docs/en/interactive-mode).
+    name = 'CLAUDE',
+    entries = {
+      { key = 'Shift+Tab',      desc = 'Cycle permission modes' },
+      { key = 'Esc',            desc = 'Interrupt Claude / close dialog' },
+      { key = 'Esc Esc',        desc = 'Clear draft, or rewind menu' },
+      { key = '! prefix',       desc = 'Shell mode: run command directly' },
+      { key = '@',              desc = 'File path autocomplete' },
+      { key = '/ prefix',       desc = 'Commands and skills menu' },
+      { key = 'Ctrl+O',         desc = 'Toggle transcript viewer' },
+      { key = 'Ctrl+R',         desc = 'Search prompt history' },
+      { key = 'Ctrl+B',         desc = 'Background running task' },
+      { key = 'Ctrl+T',         desc = 'Toggle task checklist' },
+      { key = 'Ctrl+G',         desc = 'Edit prompt in text editor' },
+      { key = 'Shift+Enter',    desc = 'Insert newline' },
+      { key = 'Alt+P',          desc = 'Switch model' },
+      { key = 'Alt+T',          desc = 'Toggle extended thinking' },
+    },
+  },
+}
+
+-- Hotkey overlay (LEADER ?): fuzzy-searchable categorized cheatsheet.
+-- MUX entries execute when selected, which-key style; reference entries
+-- (NVIM, CLAUDE) are display-only and just dismiss. The bracketed category
+-- prefix keeps sections fuzzy-filterable (e.g. type 'nvim').
 local function hotkey_overlay()
+  local function label(section, key, desc)
+    return string.format('%-8s %-14s %s', '[' .. section .. ']', key, desc)
+  end
   local choices = {}
   for i, b in ipairs(mux_bindings) do
     table.insert(choices, {
-      id = tostring(i),
-      label = string.format('LEADER %-4s %s', b.key, b.desc),
+      id = 'mux:' .. i,
+      label = label('MUX', 'LEADER ' .. b.key, b.desc),
     })
   end
+  for _, section in ipairs(reference_sections) do
+    for i, e in ipairs(section.entries) do
+      table.insert(choices, {
+        id = string.format('ref:%s:%d', section.name, i),
+        label = label(section.name, e.key, e.desc),
+      })
+    end
+  end
   return act.InputSelector {
-    title = 'WezTerm Mux Hotkeys',
+    title = 'Hotkeys',
     choices = choices,
     fuzzy = true,
     fuzzy_description = 'Filter hotkeys: ',
     action = wezterm.action_callback(function(window, pane, id)
-      if id then
-        window:perform_action(mux_bindings[tonumber(id)].action, pane)
+      local i = id and id:match('^mux:(%d+)$')
+      if i then
+        window:perform_action(mux_bindings[tonumber(i)].action, pane)
       end
     end),
   }
@@ -151,7 +218,7 @@ mux_bindings[#mux_bindings].action = hotkey_overlay()
 
 config.keys = {}
 for _, b in ipairs(mux_bindings) do
-  table.insert(config.keys, { key = b.key, mods = 'LEADER', action = b.action })
+  table.insert(config.keys, { key = b.key, mods = b.mods or 'LEADER', action = b.action })
 end
 
 -- Copy mode: vi keys
