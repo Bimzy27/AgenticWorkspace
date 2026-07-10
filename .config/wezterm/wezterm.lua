@@ -48,6 +48,9 @@ config.color_scheme = 'Catppuccin Mocha'
 config.max_fps = 120
 config.animation_fps = 60
 config.front_end = 'WebGpu'
+-- Prefer the discrete GPU (RTX) over the Intel iGPU; WebGpu defaults to the
+-- low-power adapter, whose drivers cause stale-pane artifacts on split/close.
+config.webgpu_power_preference = 'HighPerformance'
 
 -- Inactive pane dimming
 config.inactive_pane_hsb = {
@@ -68,8 +71,12 @@ end
 -- Scrollback
 config.scrollback_lines = 10000
 
--- Leader key (Ctrl+a, like tmux)
-config.leader = { key = 'Space', mods = 'CTRL', timeout_milliseconds = 1000 }
+-- Leader key: F24 (M5 on the Keychron, remapped via Keychron Launcher).
+-- WezTerm's Windows backend does not decode F21-F24 into named keys
+-- (wezterm/wezterm#5749), so match the raw Win32 virtual key code instead:
+-- VK_F24 = 0x87 = 135. Ctrl+Space also works as a secondary leader via the
+-- 'secondary_leader' key table below, built from the same mux_bindings.
+config.leader = { key = 'raw:135', timeout_milliseconds = 1000 }
 
 -- Leader bindings: single source of truth for config.keys AND the hotkey overlay.
 -- Add/remove bindings here only; both the keybinding and its overlay entry follow.
@@ -221,8 +228,30 @@ for _, b in ipairs(mux_bindings) do
   table.insert(config.keys, { key = b.key, mods = b.mods or 'LEADER', action = b.action })
 end
 
+-- Secondary leader (Ctrl+Space): mirrors every LEADER binding through a
+-- one-shot key table, since WezTerm allows only a single config.leader.
+local leader_table = {}
+for _, b in ipairs(mux_bindings) do
+  local mods = (b.mods or 'LEADER'):gsub('LEADER|?', '')
+  table.insert(leader_table, {
+    key = b.key,
+    mods = mods == '' and 'NONE' or mods,
+    action = b.action,
+  })
+end
+table.insert(config.keys, {
+  key = 'Space',
+  mods = 'CTRL',
+  action = act.ActivateKeyTable {
+    name = 'secondary_leader',
+    one_shot = true,
+    timeout_milliseconds = 1000,
+  },
+})
+
 -- Copy mode: vi keys
 config.key_tables = {
+  secondary_leader = leader_table,
   copy_mode = {
     { key = 'h',      mods = 'NONE', action = act.CopyMode('MoveLeft') },
     { key = 'j',      mods = 'NONE', action = act.CopyMode('MoveDown') },
