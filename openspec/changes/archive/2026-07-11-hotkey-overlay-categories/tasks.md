@@ -16,4 +16,4 @@
 ## 3. Verify
 
 - [x] 3.1 Run `wezterm show-keys` and confirm `config.keys` still contains exactly one binding per MUX entry (including `SHIFT|LEADER ?`) and nothing from the reference sections
-- [ ] 3.2 In WezTerm, open `LEADER ?` and confirm: categories render grouped with aligned columns; typing `nvim` filters to the NVIM section; selecting a MUX entry (e.g. Split horizontal) executes it; selecting a reference entry dismisses with no effect
+- [x] 3.2 In WezTerm, open `LEADER ?` and confirm: categories render grouped with aligned columns; typing `nvim` filters to the NVIM section; selecting a MUX entry (e.g. Split horizontal) executes it; selecting a reference entry dismisses with no effect

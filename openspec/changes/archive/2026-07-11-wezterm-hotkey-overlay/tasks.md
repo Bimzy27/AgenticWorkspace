@@ -15,5 +15,5 @@
 ## 3. Verify
 
 - [x] 3.1 Syntax-check the config (`wezterm --config-file ... show-keys`) so a typo cannot break terminal startup
-- [ ] 3.2 Manually verify in WezTerm: `LEADER ?` opens the overlay, fuzzy filter works, Escape dismisses, and selecting "Split horizontal" splits the pane
-- [ ] 3.3 Spot-check that pre-existing bindings (e.g. `LEADER \`, `LEADER h`, `LEADER c`) still work
+- [x] 3.2 Manually verify in WezTerm: `LEADER ?` opens the overlay, fuzzy filter works, Escape dismisses, and selecting "Split horizontal" splits the pane
+- [x] 3.3 Spot-check that pre-existing bindings (e.g. `LEADER \`, `LEADER h`, `LEADER c`) still work
