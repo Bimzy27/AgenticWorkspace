@@ -8,6 +8,12 @@ description: Pull the next work item from the project's queue, claim it, and dri
 Turn a waiting queue into finished, shipped work.
 One item per invocation: claim it, do it, deliver it, stop.
 
+## Before activating this skill
+
+AGENTS.md currently rules "do not commit or push unless asked", which is correct for interactive work but blocks an autonomous loop.
+When implementing loops, update that rule in AGENTS.md with a carve-out: commits and pushes made by the /next, /ship workflow on a claimed queue item count as asked-for.
+Do not activate this skill until that carve-out exists, or every iteration will stall waiting for permission.
+
 ## Resolve the queue
 
 Use the first source that exists in the project:
