@@ -39,12 +39,28 @@ Non-negotiable in every project:
 - Report honestly: if a check failed, was skipped, or was not run, say so plainly.
   Never describe unverified work as done.
 
+## Operating principles
+
+How to work, regardless of which model is running:
+
+- Investigate before acting.
+  Reproduce the problem, read the relevant code, and verify assumptions against the actual system (installed versions, real configs, live behaviour) instead of pattern-matching to a familiar failure.
+- Ground claims in evidence.
+  Check the source, changelog, or issue tracker rather than trusting memory; if you did not verify it, do not state it as fact.
+- Fix root causes, not symptoms.
+  When an upstream bug forces a workaround, say so and link the issue in a code comment.
+- Verify end to end after changing anything.
+  If verification needs something only Branden can do (a physical key press, a login), set up the test and hand over exact steps.
+- Lead with the outcome.
+  The first sentence of a report answers what happened or what was found; supporting detail comes after.
+- When blocked on a decision only Branden can make, present numbered options with a recommendation; otherwise pick the sensible default, state it, and proceed.
+
 ## Quality Gate
 
-Default skills are installed at `~/.claude/skills` and work in any project: `typecheck`, `lint`, `audit`, `police`, `patrol`, and `ship`.
+Default skills are installed at `~/.claude/skills` and work in any project: `typecheck`, `lint`, `audit`, `police`, `patrol`, `ship`, `commit`, and `release`.
 After completing a set of code changes, run /patrol before committing or reporting the task as done.
 Patrol runs typecheck, lint, audit, police, and tests in order, and you must fix failures as they arise until the whole gate is green.
-When work is ready to deliver, use /ship so branches, commits, and pull requests follow one standard shape.
+Delivery has three shapes: /commit for direct-push repos, /release to promote develop into the release branch, and /ship for pull-request flows.
 If the project has a POLICE.md, its rules are law for every changeset; never water them down or grant exceptions.
 
 ## Definition of done

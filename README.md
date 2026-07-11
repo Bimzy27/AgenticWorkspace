@@ -125,7 +125,9 @@ To update agent instructions, edit `AGENTS.md` only.
 | `/audit` | Scan dependencies for known CVEs and the changeset for leaked secrets |
 | `/police` | Enforce the project's `POLICE.md` behaviour rules against the current changeset |
 | `/patrol` | The full quality gate: typecheck, lint, audit, police, then tests, fixed until green |
-| `/ship` | Standardized delivery: run the gate, code-review and security-review the diff, commit, push, open a PR |
+| `/commit` | Quick delivery: sanity-pass the diff, conventional commit, push |
+| `/release` | Promote develop into the release branch to trigger a production deploy |
+| `/ship` | Standardized PR delivery: run the gate, code-review and security-review the diff, commit, push, open a PR |
 
 Each skill resolves commands from the project itself first (docs, package scripts, task runners) and falls back to ecosystem defaults, so no per-project setup is required.
 

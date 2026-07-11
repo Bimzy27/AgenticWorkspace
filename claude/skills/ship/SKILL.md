@@ -33,4 +33,5 @@ Every agent shipping through this skill produces the same shape of branch, commi
 
 - If the working tree contains changes unrelated to the task being shipped, leave them out of the commits and say so in the report.
 - If the repo has no remote or no PR flow (a local-only project), fall back to committing on a branch and reporting; do not invent a workflow the project does not have.
+- Repos that deliver by direct push use /commit instead; repos that deliver by promoting develop into the release branch use /release for that promotion.
 - Draft PRs are the default when patrol passed but the task's own acceptance criteria are unverified; say why in the PR body.
