@@ -1,4 +1,4 @@
-# bootstrap/windows.ps1 - set up dotfiles on Windows 11
+﻿# bootstrap/windows.ps1 - set up dotfiles on Windows 11
 # Run from an elevated PowerShell 7+ prompt:
 #   Set-ExecutionPolicy Bypass -Scope Process -Force
 #   .\bootstrap\windows.ps1
@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $DOTFILES = Split-Path $PSScriptRoot -Parent
 
-function Link-Item {
+function New-Link {
     param($Src, $Dst)
     $dstDir = Split-Path $Dst -Parent
     if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
@@ -27,19 +27,19 @@ Write-Host "Creating symlinks..."
 
 # WezTerm - directory symlink so wezterm.lua can require() sibling modules.
 # ~\.config\wezterm\wezterm.lua takes precedence over ~\.wezterm.lua.
-Link-Item "$DOTFILES\.config\wezterm" "$env:USERPROFILE\.config\wezterm"
+New-Link "$DOTFILES\.config\wezterm" "$env:USERPROFILE\.config\wezterm"
 if (Test-Path "$env:USERPROFILE\.wezterm.lua") {
     Remove-Item "$env:USERPROFILE\.wezterm.lua" -Force
     Write-Host "  removed legacy: $env:USERPROFILE\.wezterm.lua"
 }
 
 # Neovim - AppData\Local\nvim
-Link-Item "$DOTFILES\.config\nvim" "$env:LOCALAPPDATA\nvim"
+New-Link "$DOTFILES\.config\nvim" "$env:LOCALAPPDATA\nvim"
 
 # AGENTS.md → Claude global config
 $claudeDir = "$env:USERPROFILE\.claude"
 if (-not (Test-Path $claudeDir)) { New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null }
-Link-Item "$DOTFILES\AGENTS.md" "$claudeDir\CLAUDE.md"
+New-Link "$DOTFILES\AGENTS.md" "$claudeDir\CLAUDE.md"
 
 # CLAUDE.md in repo → AGENTS.md (same-directory symlink)
 $claudeMd = "$DOTFILES\CLAUDE.md"
@@ -73,7 +73,7 @@ $packages = @(
 foreach ($pkg in $packages) {
     Write-Host "  Installing $($pkg.Name)..."
     winget install --id $pkg.Id -e --accept-source-agreements --accept-package-agreements --silent 2>$null
-    if (-not $?) { Write-Warning "  $($pkg.Name) may already be installed or failed — continuing." }
+    if (-not $?) { Write-Warning "  $($pkg.Name) may already be installed or failed - continuing." }
 }
 
 # ── Agent CLIs (npm) ──────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ Write-Host "Installing agent CLIs via npm..."
 foreach ($cli in @('@anthropic-ai/claude-code', 'opencode-ai', '@fission-ai/openspec')) {
     Write-Host "  Installing $cli..."
     npm install -g $cli
-    if (-not $?) { Write-Warning "  $cli install failed — continuing." }
+    if (-not $?) { Write-Warning "  $cli install failed - continuing." }
 }
 
 # ── PowerShell profile ────────────────────────────────────────────────────────

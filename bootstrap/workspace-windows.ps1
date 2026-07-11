@@ -1,7 +1,7 @@
-#Requires -Version 7
+﻿#Requires -Version 7
 <#
 .SYNOPSIS
-    Windows workspace installer — installs all tools needed for agentic development.
+    Windows workspace installer - installs all tools needed for agentic development.
 
 .DESCRIPTION
     Installs (idempotently via winget/npm/gh):
@@ -15,7 +15,7 @@
       - OpenSpec CLI  (@fission-ai/openspec)
       - GitHub Copilot CLI  (gh extension)
 
-    Safe to re-run — already-installed packages are skipped.
+    Safe to re-run - already-installed packages are skipped.
 
 .PARAMETER SkipVSCode
     Skip VS Code and its extensions.
@@ -82,11 +82,11 @@ function Install-Winget {
     # Check if already installed
     $existing = winget list --id $Id --exact 2>$null | Select-String $Id
     if ($existing) {
-        Write-Ok "$Name already installed — skipping"
+        Write-Ok "$Name already installed - skipping"
         return
     }
 
-    $args = @(
+    $wingetArgs = @(
         'install', '--id', $Id,
         '--exact',
         '--accept-source-agreements',
@@ -94,11 +94,11 @@ function Install-Winget {
         '--silent'
     ) + $ExtraArgs
 
-    winget @args
+    winget @wingetArgs
     if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq -1978335189) {  # -1978335189 = already installed
         Write-Ok "$Name installed"
     } else {
-        Write-Warn "$Name install exited $LASTEXITCODE — may need manual install"
+        Write-Warn "$Name install exited $LASTEXITCODE - may need manual install"
     }
 }
 
@@ -113,7 +113,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 }
 Write-Ok "winget $(winget --version)"
 
-# Elevation check (soft warning — Developer Mode covers symlinks)
+# Elevation check (soft warning - Developer Mode covers symlinks)
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
     ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
@@ -158,7 +158,7 @@ if (-not $SkipVSCode) {
                 if ($LASTEXITCODE -eq 0) {
                     Write-Ok "  $($ext.Name) installed"
                 } else {
-                    Write-Warn "  $($ext.Name) — check manually in VS Code Extensions tab"
+                    Write-Warn "  $($ext.Name) - check manually in VS Code Extensions tab"
                 }
             }
         } else {
@@ -188,7 +188,7 @@ if (Get-Command npm -ErrorAction SilentlyContinue) {
         $claudeVersion = claude --version 2>$null
         if ($claudeVersion) { Write-Ok "Version: $claudeVersion" }
     } else {
-        Write-Fail "npm install failed — check Node.js installation"
+        Write-Fail "npm install failed - check Node.js installation"
     }
 } else {
     Write-Warn "npm not on PATH. Restart your terminal after Node.js install, then run:"
@@ -211,7 +211,7 @@ if (Get-Command npm -ErrorAction SilentlyContinue) {
         if ($LASTEXITCODE -eq 0) {
             Write-Ok "$($cli.Name) installed"
         } else {
-            Write-Warn "$($cli.Name) install failed — try manually: npm install -g $($cli.Pkg)"
+            Write-Warn "$($cli.Name) install failed - try manually: npm install -g $($cli.Pkg)"
         }
     }
 } else {
@@ -226,7 +226,7 @@ Write-Header "GitHub Copilot CLI  (gh extension)"
 
 if (Get-Command gh -ErrorAction SilentlyContinue) {
     # Check if already authenticated
-    $ghAuth = gh auth status 2>&1
+    $null = gh auth status 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Warn "GitHub CLI not authenticated. Run the following, then re-run this script:"
         Write-Warn "  gh auth login"
@@ -243,7 +243,7 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
                 Write-Ok "GitHub Copilot CLI already installed"
                 gh extension upgrade github/gh-copilot 2>$null
             } else {
-                Write-Warn "gh extension install failed — try manually: gh extension install github/gh-copilot"
+                Write-Warn "gh extension install failed - try manually: gh extension install github/gh-copilot"
             }
         }
     }
@@ -276,7 +276,7 @@ foreach ($check in $checks) {
     if ($cmd) {
         Write-Ok "$($check.Label)  ($($cmd.Source))"
     } else {
-        Write-Warn "$($check.Label)  — not found on PATH (may need terminal restart)"
+        Write-Warn "$($check.Label)  - not found on PATH (may need terminal restart)"
     }
 }
 
@@ -285,7 +285,7 @@ $copilotExt = gh extension list 2>$null | Select-String 'gh-copilot'
 if ($copilotExt) {
     Write-Ok "GitHub Copilot CLI  (gh copilot)"
 } else {
-    Write-Warn "GitHub Copilot CLI  — run 'gh auth login' then 'gh extension install github/gh-copilot'"
+    Write-Warn "GitHub Copilot CLI  - run 'gh auth login' then 'gh extension install github/gh-copilot'"
 }
 
 Write-Host ""
