@@ -11,6 +11,11 @@ local is_linux = wezterm.target_triple:find('linux') ~= nil
 config.unix_domains = { { name = 'main' } }
 config.default_gui_startup_args = { 'connect', 'main' }
 
+-- Reboot persistence: the mux server snapshots its layout periodically and
+-- rebuilds it on mux-startup, so sessions survive a reboot too (layout + cwd;
+-- running programs restart as fresh shells). See mux-sessions.lua.
+require('mux-sessions').enable()
+
 -- Launch fullscreen. 'gui-startup' only fires for plain `wezterm start`; when the GUI
 -- launches via `connect` (default_gui_startup_args above) 'gui-attached' fires instead.
 -- The is_full_screen guard prevents a double toggle when both events fire.

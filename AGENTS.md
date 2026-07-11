@@ -81,7 +81,7 @@ Rules scoped to work inside the AgenticWorkspace repo itself:
 - Windows is the primary platform and scripts are PowerShell 7; Linux/Omarchy support is secondary.
 - Commit directly to master here; this repo does not use pull requests.
 - Setup scripts must stay idempotent; safe to re-run is a requirement.
-- WezTerm reads `~/.wezterm.lua` through a symlink, and its file watcher misses edits made to the symlink target; after config changes, reload with Ctrl+Shift+R rather than trusting auto-reload.
+- WezTerm reads `~/.config/wezterm/` through a directory symlink, and its file watcher misses edits made to the symlink target; after config changes, reload with Ctrl+Shift+R rather than trusting auto-reload.
 - Skill changes under `claude/skills/` are live for new Claude Code sessions with no install step; `claude/skills-inactive/` is staged and not loaded.
 
 ## Branden's Opinions

@@ -25,8 +25,13 @@ function Link-Item {
 
 Write-Host "Creating symlinks..."
 
-# WezTerm - reads from USERPROFILE\.wezterm.lua or AppData
-Link-Item "$DOTFILES\.config\wezterm\wezterm.lua" "$env:USERPROFILE\.wezterm.lua"
+# WezTerm - directory symlink so wezterm.lua can require() sibling modules.
+# ~\.config\wezterm\wezterm.lua takes precedence over ~\.wezterm.lua.
+Link-Item "$DOTFILES\.config\wezterm" "$env:USERPROFILE\.config\wezterm"
+if (Test-Path "$env:USERPROFILE\.wezterm.lua") {
+    Remove-Item "$env:USERPROFILE\.wezterm.lua" -Force
+    Write-Host "  removed legacy: $env:USERPROFILE\.wezterm.lua"
+}
 
 # Neovim - AppData\Local\nvim
 Link-Item "$DOTFILES\.config\nvim" "$env:LOCALAPPDATA\nvim"

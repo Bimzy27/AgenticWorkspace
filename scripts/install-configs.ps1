@@ -102,8 +102,17 @@ Install-Link "$REPO\.config\opencode\opencode.json"  "$env:USERPROFILE\.config\o
 # ── WezTerm ───────────────────────────────────────────────────────────────────
 
 Write-Header "WezTerm"
-Write-Step "~\.wezterm.lua"
-Install-Link "$REPO\.config\wezterm\wezterm.lua"  "$env:USERPROFILE\.wezterm.lua"
+
+# Directory symlink (not just wezterm.lua) so the config can require() sibling
+# modules like mux-sessions.lua. ~\.config\wezterm\wezterm.lua takes precedence
+# over the legacy ~\.wezterm.lua location, which is removed if present.
+Write-Step "~\.config\wezterm"
+Install-Link "$REPO\.config\wezterm"  "$env:USERPROFILE\.config\wezterm"
+$legacyWez = "$env:USERPROFILE\.wezterm.lua"
+if (Test-Path $legacyWez) {
+    Remove-Item $legacyWez -Force
+    Write-Ok "removed legacy ~\.wezterm.lua"
+}
 
 # Mux server logon task: keeps sessions alive across GUI restarts.
 # wezterm.lua connects to the 'main' unix domain served by this process.
