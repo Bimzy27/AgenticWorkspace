@@ -87,6 +87,12 @@ Install-Link "$REPO\claude\settings.json"  "$env:USERPROFILE\.claude\settings.js
 Write-Step "~\.claude\skills"
 Install-Link "$REPO\claude\skills"  "$env:USERPROFILE\.claude\skills"
 
+# Opinions and voice profile referenced by AGENTS.md
+Write-Step "~\OPINIONS.md"
+Install-Link "$REPO\OPINIONS.md"  "$env:USERPROFILE\OPINIONS.md"
+Write-Step "~\VOICE.md"
+Install-Link "$REPO\VOICE.md"  "$env:USERPROFILE\VOICE.md"
+
 # ── OpenCode ──────────────────────────────────────────────────────────────────
 
 Write-Header "OpenCode"
