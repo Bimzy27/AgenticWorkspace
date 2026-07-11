@@ -104,11 +104,20 @@ Install-Link "$REPO\.config\wezterm\wezterm.lua"  "$env:USERPROFILE\.wezterm.lua
 Write-Step "Scheduled task: WezTermMuxServer"
 $muxExe = "$env:ProgramFiles\WezTerm\wezterm-mux-server.exe"
 if (Test-Path $muxExe) {
-    $action   = New-ScheduledTaskAction -Execute $muxExe -Argument '--daemonize' -WorkingDirectory $env:USERPROFILE
-    $trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan)
-    Register-ScheduledTask -TaskName 'WezTermMuxServer' -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
-    Write-Ok "Scheduled task 'WezTermMuxServer' registered"
+    if (Get-ScheduledTask -TaskName 'WezTermMuxServer' -ErrorAction SilentlyContinue) {
+        Write-Ok "Scheduled task 'WezTermMuxServer' already registered"
+    } else {
+        $action   = New-ScheduledTaskAction -Execute $muxExe -Argument '--daemonize' -WorkingDirectory $env:USERPROFILE
+        $trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan)
+        try {
+            Register-ScheduledTask -TaskName 'WezTermMuxServer' -Action $action -Trigger $trigger -Settings $settings -ErrorAction Stop | Out-Null
+            Write-Ok "Scheduled task 'WezTermMuxServer' registered"
+        } catch {
+            Write-Fail "Could not register scheduled task: $_"
+            Write-Fail "Re-run from an elevated prompt to register it."
+        }
+    }
 } else {
     Write-Fail "wezterm-mux-server.exe not found, skipping mux logon task"
 }
