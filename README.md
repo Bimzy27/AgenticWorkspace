@@ -14,7 +14,16 @@ Claude Code is the primary AI agent harness.
 ├── AGENTS.md                       # Agent instructions - single source of truth
 ├── CLAUDE.md                       # Symlink to AGENTS.md (created by install-configs.ps1)
 ├── claude/
-│   └── settings.json               # Claude Code global settings (theme, etc.)
+│   ├── settings.json               # Claude Code global settings (theme, etc.)
+│   ├── skills/                     # Default agent skills, symlinked to ~/.claude/skills
+│   │   ├── typecheck/              # Run the project's type checker, fix until green
+│   │   ├── lint/                   # Run the project's linter/formatter, fix until clean
+│   │   ├── audit/                  # Dependency CVE scan + secrets scan on the changeset
+│   │   ├── police/                 # Enforce POLICE.md behaviour rules against a changeset
+│   │   ├── patrol/                 # Full quality gate: typecheck + lint + audit + police + tests
+│   │   └── ship/                   # Standardized delivery: gate, review, commit, push, PR
+│   └── skills-inactive/            # Staged skills, not loaded until moved into skills/
+│       └── next/                   # Autonomous-loop work intake (next -> work -> patrol -> ship)
 ├── .config/
 │   ├── wezterm/wezterm.lua         # Terminal: tabs/panes, Catppuccin Mocha, fullscreen
 │   ├── opencode/opencode.json      # OpenCode: theme, model, shared AGENTS.md instructions
@@ -104,3 +113,28 @@ Leader key: `Ctrl+Space`
 `install-configs.ps1` also symlinks `AGENTS.md` into `~/.claude/` as both `CLAUDE.md` and `AGENTS.md` so the instructions apply globally across every project.
 
 To update agent instructions, edit `AGENTS.md` only.
+
+## Agent skills
+
+`claude/skills/` holds default skills that work in any project, symlinked to `~/.claude/skills` by `install-configs.ps1`:
+
+| Skill | Purpose |
+|-------|---------|
+| `/typecheck` | Detect and run the project's type checker, fixing failures until it passes |
+| `/lint` | Detect and run the project's linter and formatter, fixing findings until clean |
+| `/audit` | Scan dependencies for known CVEs and the changeset for leaked secrets |
+| `/police` | Enforce the project's `POLICE.md` behaviour rules against the current changeset |
+| `/patrol` | The full quality gate: typecheck, lint, audit, police, then tests, fixed until green |
+| `/ship` | Standardized delivery: run the gate, code-review and security-review the diff, commit, push, open a PR |
+
+Each skill resolves commands from the project itself first (docs, package scripts, task runners) and falls back to ecosystem defaults, so no per-project setup is required.
+
+`POLICE.md` is an optional per-project file of human-written behaviour rules that tools cannot express (testing discipline, architectural boundaries, security posture).
+`/police` bootstraps one from a template when missing.
+
+The intended workflow: agents finish a task, run `/patrol`, fix whatever fails, then deliver through `/ship`.
+For unattended operation, drive `/patrol` on a loop (for example Claude Code's `/loop /patrol`) so asynchronous agents keep the gate green as they work.
+
+`claude/skills-inactive/` stages skills that are written but not yet loaded.
+It currently holds `/next`, the work-intake skill that completes the autonomous loop (`/next` -> work -> `/patrol` -> `/ship`).
+Activate it with `git mv claude/skills-inactive/next claude/skills/next` once the pipeline is ready for unattended operation.

@@ -83,6 +83,10 @@ if (-not (Test-Path $repoClaudeMd)) {
 Write-Step "~\.claude\settings.json"
 Install-Link "$REPO\claude\settings.json"  "$env:USERPROFILE\.claude\settings.json"
 
+# Default agent skills (typecheck, lint, police, patrol) available in every project
+Write-Step "~\.claude\skills"
+Install-Link "$REPO\claude\skills"  "$env:USERPROFILE\.claude\skills"
+
 # ── OpenCode ──────────────────────────────────────────────────────────────────
 
 Write-Header "OpenCode"

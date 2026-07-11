@@ -18,6 +18,14 @@ These are common instructions for Branden's agents across all scenarios.
 - Apply that same high standard to engineering excellence: lint, test failures, and test flakiness.
   If you see one, even if it is not caused by what you are working on right now, still get it fixed.
 
+## Quality Gate
+
+Default skills are installed at `~/.claude/skills` and work in any project: `typecheck`, `lint`, `audit`, `police`, `patrol`, and `ship`.
+After completing a set of code changes, run /patrol before committing or reporting the task as done.
+Patrol runs typecheck, lint, audit, police, and tests in order, and you must fix failures as they arise until the whole gate is green.
+When work is ready to deliver, use /ship so branches, commits, and pull requests follow one standard shape.
+If the project has a POLICE.md, its rules are law for every changeset; never water them down or grant exceptions.
+
 ## Branden's Opinions
 
 When you are working on something that would benefit from being informed by Branden's viewpoints, read ~/OPINIONS.md to understand.
