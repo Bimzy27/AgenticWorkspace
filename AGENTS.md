@@ -57,9 +57,10 @@ How to work, regardless of which model is running:
 
 ## Quality Gate
 
-Default skills are installed at `~/.claude/skills` and work in any project: `typecheck`, `lint`, `audit`, `police`, `patrol`, `ship`, `commit`, and `release`.
+Default skills are installed at `~/.claude/skills` and work in any project: `typecheck`, `lint`, `audit`, `police`, `patrol`, `equip`, `ship`, `commit`, and `release`.
 After completing a set of code changes, run /patrol before committing or reporting the task as done.
 Patrol runs typecheck, lint, audit, police, and tests in order, and you must fix failures as they arise until the whole gate is green.
+When a repo has no tooling for a gate stage, run /equip to set it up rather than letting the stage stay skipped; only stages equip records as not applicable may be skipped.
 Delivery has three shapes: /commit for direct-push repos, /release to promote develop into the release branch, and /ship for pull-request flows.
 If the project has a POLICE.md, its rules are law for every changeset; never water them down or grant exceptions.
 

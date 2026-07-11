@@ -23,7 +23,8 @@ Resolve the scanner by ecosystem and use the first match:
 | *.sln or *.csproj | `dotnet list package --vulnerable --include-transitive` |
 | any of the above, when `osv-scanner` is installed | `osv-scanner -r .` is an acceptable substitute |
 
-If the matching tool is not installed, do not silently pass: report the stage as SKIPPED, name the tool to install, and continue.
+If the matching tool is not installed, follow the sibling `equip` skill to install it, then run it.
+If installation is not possible in this environment, report the stage as SKIPPED, name the tool, and continue.
 
 Severity policy: high and critical findings fail the audit; moderate and low are reported but do not fail.
 
@@ -34,8 +35,9 @@ Never jump a major version to clear a finding without flagging it; if the only f
 
 Scope: uncommitted changes plus commits on the current branch since merge-base with the default branch.
 
-1. If `gitleaks` is installed, run it over that range (`gitleaks detect` with the appropriate range flags, plus `--no-git` staging scan for uncommitted work).
-2. Otherwise, read the diff hunks yourself and look for credential patterns: private key blocks, cloud provider key formats, bearer tokens, connection strings with passwords, and high-entropy literals assigned to names like key, token, secret, or password.
+1. If `gitleaks` is not installed, install it via the sibling `equip` skill first.
+2. Run `gitleaks` over that range (`gitleaks detect` with the appropriate range flags, plus `--no-git` staging scan for uncommitted work).
+3. If installation was not possible, read the diff hunks yourself and look for credential patterns: private key blocks, cloud provider key formats, bearer tokens, connection strings with passwords, and high-entropy literals assigned to names like key, token, secret, or password.
 
 Any hit fails the audit.
 Remediation is removal plus a rotation warning to the user; moving a secret to .gitignore or an env file does not un-leak something already committed, so say so explicitly when history contains it.

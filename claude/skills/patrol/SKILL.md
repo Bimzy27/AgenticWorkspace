@@ -17,6 +17,9 @@ Run every stage, fix failures as they arise, and do not report success until the
 5. **tests** - resolve the project's test command the same way the other skills resolve theirs (project docs and skills first, then package scripts or task-runner targets, then the ecosystem default such as `npm test`, `pytest`, `cargo test`, `go test ./...`, `dotnet test`).
    Run the full suite.
 
+A stage with no tooling configured is not a free pass: follow the sibling `equip` skill to set the missing tool up, then run the stage for real.
+Only a stage that equip records as not applicable for this stack (or a tool that cannot be installed in this environment) may be reported SKIPPED, and it must be named in the report.
+
 ## Loop
 
 1. Run the current stage.

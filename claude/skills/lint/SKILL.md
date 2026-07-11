@@ -27,7 +27,8 @@ Work down this list and use the first match:
 | .editorconfig with a dotnet project | `dotnet format --verify-no-changes`, fix with `dotnet format` |
 | stylua.toml (Lua) | `stylua --check .`, fix with `stylua .` |
 
-If nothing matches, report that the project has no linter configured, recommend one for the stack, and stop.
+If nothing matches, follow the sibling `equip` skill to set a linter up, then verify with the command it configured.
+If equip finds no viable linter for the stack, report the stage as not applicable.
 
 ## Fix loop
 

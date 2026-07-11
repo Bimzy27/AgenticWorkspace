@@ -26,7 +26,8 @@ Work down this list and use the first match:
 | *.sln or *.csproj | `dotnet build --nologo -warnaserror` |
 | build.gradle(.kts) or pom.xml | `./gradlew compileJava compileTestJava` or `mvn -q compile test-compile` |
 
-If nothing matches, report that the project has no type checker, recommend one for the stack, and stop.
+If nothing matches, follow the sibling `equip` skill to set a type checker up, then run the command it configured.
+If equip finds no viable type checker for the stack, report the stage as not applicable.
 Never guess at a command that is not evidenced by the repo.
 
 ## Fix loop
