@@ -31,6 +31,14 @@ wezterm.on('gui-attached', function()
       gui:toggle_fullscreen()
     end
   end
+  -- Workaround for an upstream mux sizing bug (wezterm/wezterm#2351, #6884):
+  -- when a resize races the attach (the fullscreen toggle above), pane sizes
+  -- and content can render stale until the window is resized again or the
+  -- config is reloaded. A one-shot reload after the toggle settles forces a
+  -- full re-layout and repaint of every mirrored pane.
+  wezterm.time.call_after(1.0, function()
+    wezterm.reload_configuration()
+  end)
 end)
 
 -- Appearance: frameless single-window, no distractions

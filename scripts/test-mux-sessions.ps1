@@ -100,6 +100,26 @@ return config
     Assert-True (($restored | Where-Object is_zoomed).Count -eq 1) "restored zoomed pane"
     $active = $restored | Where-Object { $_.is_active -and $_.cwd -eq 'file:///C:/temp/' }
     Assert-True ($null -ne $active) "restored active pane (C:/temp)"
+
+    # Restore must honor the saved window cell size, not the 80x24 default;
+    # rebuilding tiny is what makes the fullscreen attach resize misrender
+    # panes (wezterm/wezterm#2351). Use a synthetic state file with a
+    # distinctive 200x50 window: two side-by-side panes (99 + separator + 100).
+    Write-Host "mux-sessions e2e: restore honors saved window size" -ForegroundColor Cyan
+    Stop-Process -Id $serverProc.Id -Force
+    Start-Sleep -Seconds 1
+    @'
+{"version":1,"saved_at":0,"windows":[{"workspace":"default","tabs":[{"title":"","is_active":true,"panes":[{"left":0,"top":0,"width":99,"height":50,"is_active":true,"is_zoomed":false,"cwd":"C:\\Programming\\"},{"left":100,"top":0,"width":100,"height":50,"is_active":false,"is_zoomed":false,"cwd":"C:\\Programming\\"}]}]}]}
+'@ | Set-Content "$dir\state.json"
+    $serverProc = Start-TestServer
+    Start-Sleep -Seconds 2
+
+    $sized = @(wezterm cli list --format json | ConvertFrom-Json)
+    Assert-True ($sized.Count -eq 2) "size restore: 2 panes (got $($sized.Count))"
+    $rows = @($sized.size.rows | Select-Object -Unique)
+    Assert-True (($rows.Count -eq 1) -and ([int]$rows[0] -eq 50)) "size restore: pane rows are 50 (got $($rows -join ','))"
+    $colSum = ($sized.size.cols | Measure-Object -Sum).Sum
+    Assert-True ([math]::Abs($colSum - 199) -le 2) "size restore: pane cols sum ~199 (got $colSum)"
 } finally {
     if ($serverProc -and -not $serverProc.HasExited) {
         Stop-Process -Id $serverProc.Id -Force -ErrorAction SilentlyContinue

@@ -2,9 +2,10 @@
 --
 -- The mux server holds all windows/tabs/panes in memory, so a reboot loses
 -- them even though the WezTermMuxServer logon task restarts the process.
--- This module snapshots the mux layout (workspaces, tabs, pane splits, pane
--- working directories, titles, zoom/active flags) to a JSON file on a timer,
--- and rebuilds it on 'mux-startup' when a fresh mux server boots.
+-- This module snapshots the mux layout (workspaces, window cell sizes, tabs,
+-- pane splits, pane working directories, titles, zoom/active flags) to a JSON
+-- file on a timer, and rebuilds it on 'mux-startup' when a fresh mux server
+-- boots, spawning each window at its saved size.
 --
 -- It is self-contained on purpose: the canonical plugin for this
 -- (MLFlexer/resurrect.wezterm) was archived in May 2026 with "use a fork"
@@ -310,6 +311,19 @@ end
 
 -- ── Restore ───────────────────────────────────────────────────────────────
 
+-- Saved cell size of a window, taken from the extent of its first tab's
+-- pane rectangles (every tab in a window shares the window size). Returns
+-- nil when the saved geometry is unusable so the caller can fall back to
+-- the default size.
+local function saved_window_size(saved_win)
+  local x0, y0, x1, y1 = extent(saved_win.tabs[1].panes)
+  local width, height = x1 - x0, y1 - y0
+  if width > 0 and height > 0 and width < math.huge and height < math.huge then
+    return width, height
+  end
+  return nil, nil
+end
+
 -- Rebuild all saved windows. Returns true if anything was restored.
 function M.restore()
   local state = M.load()
@@ -319,9 +333,17 @@ function M.restore()
   for _, saved_win in ipairs(state.windows) do
     local first = saved_win.tabs[1]
     local first_tree = build_tree(first.panes)
+    -- Spawn at the saved cell size rather than the 80x24 default. Without
+    -- this the whole layout is rebuilt tiny, and the resize to fullscreen
+    -- on the next GUI attach is exactly the path where mux size sync is
+    -- unreliable (wezterm/wezterm#2351), which shows up as mis-rendered
+    -- panes when the window opens.
+    local width, height = saved_window_size(saved_win)
     local tab, pane, win = wezterm.mux.spawn_window {
       workspace = saved_win.workspace,
       cwd = first_leaf(first_tree).cwd,
+      width = width,
+      height = height,
     }
     realize_tab(tab, pane, first, first_tree)
     local active_tab = first.is_active and tab or nil
