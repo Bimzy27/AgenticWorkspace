@@ -59,8 +59,9 @@ These are machine-level installs, not repo files; name them in the report so oth
 
 ### Police
 
-Bootstrap `POLICE.md` from `POLICE.template.md` in the police skill's directory.
-Seed it with rules evidenced by the repo itself (conventions in its AGENTS.md or README, patterns the code already follows) and delete template examples that do not apply.
+Repos without their own police file are already covered by the global fallback at `~/.claude/POLICE.md`, so a missing `POLICE.md` is a gap only when the project needs rules of its own.
+When it does, bootstrap `POLICE.md` from `POLICE.template.md` in the police skill's directory.
+Seed it with the global fallback rules that still apply (a repo file replaces the fallback, it does not extend it), plus rules evidenced by the repo itself (conventions in its AGENTS.md or README, patterns the code already follows), and delete template examples that do not apply.
 Police rules are law once committed, so present the seeded rules for approval before enforcing them.
 
 ### Tests

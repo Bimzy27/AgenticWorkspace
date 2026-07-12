@@ -63,6 +63,7 @@ Patrol runs typecheck, lint, audit, police, and tests in order, and you must fix
 When a repo has no tooling for a gate stage, run /equip to set it up rather than letting the stage stay skipped; only stages equip records as not applicable may be skipped.
 Delivery has three shapes: /commit for direct-push repos, /release to promote develop into the release branch, and /ship for pull-request flows.
 If the project has a POLICE.md, its rules are law for every changeset; never water them down or grant exceptions.
+Repos without their own POLICE.md fall back to the global rules symlinked at `~/.claude/POLICE.md`; a repo file replaces the fallback entirely, so it must carry over any global rules that still apply.
 
 ## Definition of done
 

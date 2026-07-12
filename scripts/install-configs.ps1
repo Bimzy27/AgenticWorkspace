@@ -83,6 +83,10 @@ if (-not (Test-Path $repoClaudeMd)) {
 Write-Step "~\.claude\settings.json"
 Install-Link "$REPO\claude\settings.json"  "$env:USERPROFILE\.claude\settings.json"
 
+# Global police fallback rules, used by the police skill when a repo has no POLICE.md
+Write-Step "~\.claude\POLICE.md"
+Install-Link "$REPO\claude\POLICE.md"  "$env:USERPROFILE\.claude\POLICE.md"
+
 # Default agent skills (typecheck, lint, police, patrol) available in every project
 Write-Step "~\.claude\skills"
 Install-Link "$REPO\claude\skills"  "$env:USERPROFILE\.claude\skills"

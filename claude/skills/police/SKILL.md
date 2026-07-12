@@ -11,7 +11,9 @@ These are human-written rules that linters and type checkers cannot express: arc
 ## Locate the police file
 
 Look in order: `POLICE.md` at the repo root, `.claude/POLICE.md`, `docs/POLICE.md`.
-If none exists, bootstrap one from `POLICE.template.md` in this skill's directory by following the sibling `equip` skill, and get the seeded rules approved before enforcing them.
+If the repo has none of these, fall back to the global rules at `~/.claude/POLICE.md` and name the fallback in the report.
+A repo file replaces the global fallback entirely; never merge the two.
+If the global file does not exist either, bootstrap a repo file from `POLICE.template.md` in this skill's directory by following the sibling `equip` skill, and get the seeded rules approved before enforcing them.
 Never invent rules that are not written down.
 
 ## Determine the changeset
