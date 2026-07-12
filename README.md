@@ -100,6 +100,7 @@ Leader key: `Ctrl+Space`
 | [Claude Code](https://claude.ai/code) | Primary AI agent harness |
 | [OpenCode](https://opencode.ai) | Alternative terminal AI agent |
 | [OpenSpec](https://github.com/Fission-AI/OpenSpec) | Spec-driven development workflow |
+| [Agentic Project Tracker](https://github.com/Bimzy27/AgenticProjectTracker) | Mission control desktop app for agent-driven projects |
 | [GitHub CLI](https://cli.github.com) | Git forge integration |
 | [lazygit](https://github.com/jesseduffield/lazygit) | TUI git client |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast grep |

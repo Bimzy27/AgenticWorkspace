@@ -10,6 +10,7 @@
       - Neovim
       - Visual Studio Code + Claude Code extension + GitHub Copilot extensions
       - Claude for Desktop
+      - Agentic Project Tracker  (latest GitHub release)
       - Claude CLI  (@anthropic-ai/claude-code)
       - OpenCode CLI  (opencode-ai)
       - OpenSpec CLI  (@fission-ai/openspec)
@@ -176,6 +177,60 @@ Write-Header "Claude for Desktop"
 
 Install-Winget -Id 'Anthropic.Claude' -Name 'Claude for Desktop'
 
+# ── Agentic Project Tracker ───────────────────────────────────────────────────
+
+Write-Header "Agentic Project Tracker"
+
+$aptRepo = 'Bimzy27/AgenticProjectTracker'
+
+# The NSIS installer registers per-user; the uninstall entry carries the version.
+function Get-AgenticProjectTrackerVersion {
+    $entry = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' -ErrorAction SilentlyContinue |
+        Get-ItemProperty -ErrorAction SilentlyContinue |
+        Where-Object { $_.PSObject.Properties['DisplayName'] -and $_.DisplayName -like 'Agentic Project Tracker*' } |
+        Select-Object -First 1
+    if ($entry -and $entry.PSObject.Properties['DisplayVersion']) { return $entry.DisplayVersion }
+    return $null
+}
+
+try {
+    $release = Invoke-RestMethod "https://api.github.com/repos/$aptRepo/releases/latest" -ErrorAction Stop
+    $latestVersion = $release.tag_name -replace '^v', ''
+    $installedVersion = Get-AgenticProjectTrackerVersion
+
+    if ($installedVersion -eq $latestVersion) {
+        Write-Ok "Agentic Project Tracker $installedVersion already installed - skipping"
+    } else {
+        if ($installedVersion) {
+            Write-Step "Updating Agentic Project Tracker $installedVersion -> $latestVersion..."
+        } else {
+            Write-Step "Installing Agentic Project Tracker $latestVersion..."
+        }
+
+        $asset = $release.assets |
+            Where-Object { $_.name -like 'AgenticProjectTracker-Setup-*.exe' } |
+            Select-Object -First 1
+        if (-not $asset) { throw "release $($release.tag_name) has no installer asset" }
+
+        $installerPath = Join-Path ([IO.Path]::GetTempPath()) $asset.name
+        Write-Step "Downloading $($asset.name)..."
+        Invoke-WebRequest $asset.browser_download_url -OutFile $installerPath -ErrorAction Stop
+
+        # /S = NSIS silent install; an existing install is upgraded in place
+        $proc = Start-Process -FilePath $installerPath -ArgumentList '/S' -Wait -PassThru
+        Remove-Item $installerPath -ErrorAction SilentlyContinue
+
+        if ($proc.ExitCode -eq 0) {
+            Write-Ok "Agentic Project Tracker $latestVersion installed"
+        } else {
+            Write-Warn "Installer exited $($proc.ExitCode) - install manually from https://github.com/$aptRepo/releases/latest"
+        }
+    }
+} catch {
+    Write-Warn "Agentic Project Tracker install failed: $($_.Exception.Message)"
+    Write-Warn "Install manually from https://github.com/$aptRepo/releases/latest"
+}
+
 # ── Claude CLI ────────────────────────────────────────────────────────────────
 
 Write-Header "Claude CLI  (@anthropic-ai/claude-code)"
@@ -278,6 +333,14 @@ foreach ($check in $checks) {
     } else {
         Write-Warn "$($check.Label)  - not found on PATH (may need terminal restart)"
     }
+}
+
+# Agentic Project Tracker check
+$aptVersion = Get-AgenticProjectTrackerVersion
+if ($aptVersion) {
+    Write-Ok "Agentic Project Tracker $aptVersion"
+} else {
+    Write-Warn "Agentic Project Tracker  - not installed (see https://github.com/$aptRepo/releases/latest)"
 }
 
 # gh copilot check
