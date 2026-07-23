@@ -34,6 +34,9 @@ Non-negotiable in every project:
 - Commit messages follow conventional commits: a lowercase type prefix (`feat`, `fix`, `chore`, `refactor`, `docs`, `test`), a colon, then an imperative subject of 72 characters or less.
   The body explains why, not what.
 - Split unrelated changes into separate commits; never bundle them.
+- Never do dev work directly on `master`/`main`.
+  Work on a `develop` branch, or a branch cut from `develop`, and let `/release` promote `develop` into `master`/`main` when a release is cut.
+  A repo's own instructions (e.g. its README, CONTRIBUTING.md, or a scoped section in this file) can override this for repos that intentionally commit straight to `master`/`main`.
 - Do not commit or push unless asked, and never force-push.
 - When a task is ambiguous, state your interpretation and proceed on the reversible parts; ask only when the answer genuinely changes what you build.
 - Report honestly: if a check failed, was skipped, or was not run, say so plainly.
